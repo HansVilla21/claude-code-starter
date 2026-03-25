@@ -1,0 +1,15 @@
+# Secretos — NUNCA en git
+.env
+.env.*
+!.env.example
+
+# Claude Code personal
+CLAUDE.local.md
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
