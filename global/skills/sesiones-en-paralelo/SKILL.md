@@ -93,7 +93,7 @@ git cherry-pick <sha>               # si no llegó, rescatalo ya: git limpia los
 **Dejar de versionar una carpeta borra lo que no estaba guardado.** En un proyecto real,
 `git rm -r --cached memory` más un merge y un `git pull` borraron del disco ediciones sin commit.
 Antes, copiala aparte (`cp -r memory ../memory-respaldo`) o commiteá su contenido. Desde ahí no tiene
-respaldo en git: definí otro. `git status` limpio es «todo lo que git sigue está guardado», no «todo».
+respaldo en git: definí otro. `git status` limpio no es «todo guardado», es «lo que git sigue, guardado».
 
 **Varias cuentas de GitHub en Windows.** Si el administrador de credenciales pregunta la cuenta en
 cada push, o sube con la equivocada, fijala por repo, nunca global:
