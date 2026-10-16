@@ -1,104 +1,72 @@
-# ============================================================
-# Claude Code Starter Kit — Instalador (Windows PowerShell)
-# Copia los archivos globales a ~/.claude/
-# ============================================================
+# =====================================================================
+# Claude Code Starter Kit v2 - instalador para Windows (PowerShell)
+# Copia las instrucciones globales y las skills a %USERPROFILE%\.claude
+# Respalda lo que reemplaza en .claude\backups\starter-kit-<fecha>
+# Uso: powershell -ExecutionPolicy Bypass -File .\install.ps1
+# =====================================================================
 
 $ErrorActionPreference = "Stop"
 
-$RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RepoDir   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $GlobalDir = Join-Path $RepoDir "global"
 $ClaudeDir = Join-Path $env:USERPROFILE ".claude"
+$Stamp     = Get-Date -Format "yyyy-MM-dd_HHmmss"
+$BackupDir = Join-Path (Join-Path $ClaudeDir "backups") ("starter-kit-" + $Stamp + "-" + $PID)
 
-Write-Host ""
-Write-Host "============================================" -ForegroundColor Blue
-Write-Host "  Claude Code Starter Kit — Instalación" -ForegroundColor Blue
-Write-Host "============================================" -ForegroundColor Blue
-Write-Host ""
-
-# Verificar que existe la carpeta global/
-if (-not (Test-Path $GlobalDir)) {
-    Write-Host "Error: No se encontró la carpeta global/ en $RepoDir" -ForegroundColor Red
+if (-not (Test-Path (Join-Path $GlobalDir "CLAUDE.md"))) {
+    Write-Host "Error: no encontre la carpeta global junto al instalador ($RepoDir)." -ForegroundColor Red
     exit 1
 }
 
-# Crear ~/.claude/ y subcarpetas si no existen
-$null = New-Item -ItemType Directory -Path $ClaudeDir -Force
-$null = New-Item -ItemType Directory -Path (Join-Path $ClaudeDir "commands") -Force
-$null = New-Item -ItemType Directory -Path (Join-Path $ClaudeDir "hooks") -Force
-
-Write-Host "Instalando archivos..." -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Claude Code Starter Kit v2 - instalacion" -ForegroundColor Cyan
 Write-Host ""
 
-$installed = @()
+$null = New-Item -ItemType Directory -Force -Path $ClaudeDir
+$null = New-Item -ItemType Directory -Force -Path (Join-Path $ClaudeDir "skills")
 
-function Install-File {
-    param($Src, $Dst, $Label)
+$installed = New-Object System.Collections.Generic.List[string]
+$backedUp  = New-Object System.Collections.Generic.List[string]
 
-    if (Test-Path $Dst) {
-        Copy-Item $Dst "${Dst}.backup" -Force
-        Copy-Item $Src $Dst -Force
-        $script:installed += "$Label (backup guardado)"
-    } else {
-        Copy-Item $Src $Dst -Force
-        $script:installed += $Label
+function Save-Backup([string]$Path, [string]$Relative) {
+    if (Test-Path $Path) {
+        $dest = Join-Path $BackupDir $Relative
+        $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $dest)
+        Copy-Item -Path $Path -Destination $dest -Recurse -Force
+        $backedUp.Add($Relative)
+        return $true
     }
+    return $false
 }
 
-# CLAUDE.md global
-$src = Join-Path $GlobalDir "CLAUDE.md"
-if (Test-Path $src) {
-    Install-File $src (Join-Path $ClaudeDir "CLAUDE.md") "CLAUDE.md"
+# 1. Instrucciones globales
+$dst = Join-Path $ClaudeDir "CLAUDE.md"
+$null = Save-Backup $dst "CLAUDE.md"
+Copy-Item -Path (Join-Path $GlobalDir "CLAUDE.md") -Destination $dst -Force
+$installed.Add("CLAUDE.md")
+
+# 2. Skills
+foreach ($skill in Get-ChildItem -Path (Join-Path $GlobalDir "skills") -Directory) {
+    $dst = Join-Path (Join-Path $ClaudeDir "skills") $skill.Name
+    if (Save-Backup $dst ("skills\" + $skill.Name)) { Remove-Item -Path $dst -Recurse -Force }
+    Copy-Item -Path $skill.FullName -Destination $dst -Recurse -Force
+    $installed.Add("skills\" + $skill.Name)
 }
 
-# settings.json
-$src = Join-Path $GlobalDir "settings.json"
-if (Test-Path $src) {
-    $dst = Join-Path $ClaudeDir "settings.json"
-    if (Test-Path $dst) {
-        Copy-Item $dst "${dst}.backup" -Force
-        Write-Host "  ⚠ settings.json ya existe. Backup guardado en settings.json.backup" -ForegroundColor Yellow
-        Write-Host "    Revisa y fusiona manualmente si tienes configuración personalizada." -ForegroundColor Yellow
-    }
-    Copy-Item $src $dst -Force
-    $installed += "settings.json"
+# 3. Los comandos de la v1 que ahora son skills se mueven al respaldo, para que no queden repetidos
+$commandsDir = Join-Path $ClaudeDir "commands"
+foreach ($name in @("init-proyecto", "commit", "review", "progress", "security-check")) {
+    $old = Join-Path $commandsDir ($name + ".md")
+    if (Save-Backup $old ("commands\" + $name + ".md")) { Remove-Item -Path $old -Force }
 }
 
-# Comandos
-$cmdFiles = Get-ChildItem -Path (Join-Path $GlobalDir "commands") -Filter "*.md" -ErrorAction SilentlyContinue
-foreach ($file in $cmdFiles) {
-    $dst = Join-Path $ClaudeDir "commands" $file.Name
-    Install-File $file.FullName $dst "commands/$($file.Name)"
+Write-Host ("Instalado en " + $ClaudeDir + ":") -ForegroundColor Green
+foreach ($i in $installed) { Write-Host ("  + " + $i) -ForegroundColor Green }
+if ($backedUp.Count -gt 0) {
+    Write-Host ""
+    Write-Host ("Lo que habia antes quedo respaldado en " + $BackupDir + ":") -ForegroundColor Yellow
+    foreach ($b in $backedUp) { Write-Host ("  - " + $b) -ForegroundColor Yellow }
 }
-
-# Hooks
-$hookFiles = Get-ChildItem -Path (Join-Path $GlobalDir "hooks") -ErrorAction SilentlyContinue
-foreach ($file in $hookFiles) {
-    $dst = Join-Path $ClaudeDir "hooks" $file.Name
-    Install-File $file.FullName $dst "hooks/$($file.Name)"
-}
-
-# Resultado
 Write-Host ""
-Write-Host "============================================" -ForegroundColor Green
-Write-Host "  Instalación completada" -ForegroundColor Green
-Write-Host "============================================" -ForegroundColor Green
-Write-Host ""
-Write-Host "Archivos instalados en ~/.claude/:" -ForegroundColor Green
-foreach ($item in $installed) {
-    Write-Host "  ✓ $item" -ForegroundColor Green
-}
-
-Write-Host ""
-Write-Host "Próximos pasos:" -ForegroundColor Blue
-Write-Host "  1. Abre Claude Code en cualquier carpeta de proyecto"
-Write-Host "  2. Escribe: /init-proyecto"
-Write-Host "  3. Sigue las instrucciones para generar la estructura completa"
-Write-Host ""
-Write-Host "Comandos disponibles globalmente:" -ForegroundColor Blue
-Write-Host "  /init-proyecto   -> Inicializa un proyecto nuevo"
-Write-Host "  /commit          -> Commit inteligente"
-Write-Host "  /review          -> Revisión de código"
-Write-Host "  /progress        -> Estado del proyecto"
-Write-Host "  /security-check  -> Auditoría de seguridad"
-Write-Host "  /help            -> Mapa completo del proyecto"
+Write-Host "Listo. Abri Claude Code en una carpeta y decile: 'Creemos un proyecto para ...'" -ForegroundColor Cyan
 Write-Host ""

@@ -1,130 +1,121 @@
 # Claude Code Starter Kit
 
-Setup global de Claude Code con agentes, skills, comandos y seguridad preconfigurados.
-Instálalo una vez y todos tus proyectos arrancan con estructura robusta desde el primer mensaje.
+Lo que hace falta para que Claude Code trabaje bien desde el primer día: las reglas globales que
+usamos en Momentum AI y las skills con las que trabajamos todos los días —crear proyectos, guardar
+la memoria, revisar, cuidar la seguridad, trabajar con GitHub y hacer crecer cada proyecto con
+el uso—. Se instala una vez y vale para todos tus proyectos.
 
----
+## Qué incluye
 
-## ¿Qué incluye?
+**Un `CLAUDE.md` global**, con las reglas que valen en todos tus proyectos: hablar en lenguaje
+natural, orquestar agentes, planificar antes de ejecutar, la memoria de cada proyecto, cómo crecen
+las skills, seguridad y GitHub.
 
-| Componente | Descripción |
-|-----------|-------------|
-| `~/.claude/CLAUDE.md` | Reglas globales que aplican a **todos** tus proyectos |
-| `~/.claude/settings.json` | Hooks de seguridad automáticos |
-| `~/.claude/commands/init-proyecto.md` | `/init-proyecto` — genera estructura completa en cualquier proyecto nuevo |
-| `~/.claude/commands/commit.md` | `/commit` — commit inteligente con verificación de secretos |
-| `~/.claude/commands/review.md` | `/review` — revisión de código con severidad |
-| `~/.claude/commands/progress.md` | `/progress` — estado del proyecto |
-| `~/.claude/commands/security-check.md` | `/security-check` — auditoría de seguridad |
-| `~/.claude/commands/help.md` | `/help` — mapa completo del proyecto |
-| `~/.claude/hooks/verify-no-secrets.py` | Hook que escanea secretos antes de cada commit |
+**Diecisiete skills.** No hace falta escribir comandos: se activan por lo que decís. Casi todas
+salieron de errores reales en proyectos de verdad.
 
----
+**Arrancar y ordenarse**
 
-## Instalación (una sola vez)
+| Decí algo como… | Skill | Qué hace |
+|---|---|---|
+| «Creemos un proyecto para…» | `init-proyecto` | Arma el proyecto como un equipo de agentes: el `CLAUDE.md`, la memoria y las carpetas, liviano y listo para aprender |
+| «Así me gusta que me respondas» | `perfil-del-usuario` | Aprende y respeta cómo responderte: cuánto detalle, qué tono, qué te molesta |
+| «Estoy trabado» | `tarjeta-de-hoy` | Reduce todo a una sola cosa para hoy |
 
-### Opción A — Prompt directo en Claude Code (recomendado para clase)
+**Memoria y crecimiento**
 
-Abre Claude Code en **cualquier carpeta** y pega este prompt:
+| Decí algo como… | Skill | Qué hace |
+|---|---|---|
+| «Guardá todo», «vamos a cerrar» | `checkpoint` | Guarda decisiones, aprendizajes y tareas, y deja un resumen para la próxima sesión |
+| «¿En qué vamos?» | `progress` | Qué está hecho, qué falta y qué está trabado |
+| «Convertí esto en una skill» | `creador-de-skills` | Vuelve skill un proceso que ya funcionó |
+| «Necesito un agente que…» | `crear-agente` | Suma un especialista cuando aparece el rol |
+| «Limpiemos lo que no se usa» | `archivar-en-vez-de-borrar` | Saca skills y agentes que nadie usa, sin perderlos |
+
+**Calidad**
+
+| Decí algo como… | Skill | Qué hace |
+|---|---|---|
+| «¿Funciona de verdad?» | `verificar-que-funciona` | «Compila» o «se ve bien» no es «funciona»: lo prueba donde importa |
+| «Revisá esto» | `review` | Revisa lo hecho contra las reglas del proyecto, por gravedad |
+| «¿Hay algo inseguro?» | `security-check` | Busca claves y datos sensibles expuestos |
+| «Que no suene a IA» | `matar-el-olor-a-ia` | Le saca a un texto las marcas de que lo escribió una IA |
+| «Entreguemos esto» | `reporte-de-traspaso` | El documento para que un proyecto no muera con quien lo hizo |
+
+**Git y GitHub**
+
+| Decí algo como… | Skill | Qué hace |
+|---|---|---|
+| «Hacé commit» | `commit` | Guarda los cambios en git sin secretos y sin tocar `main` |
+| «Subí esto a GitHub» | `github` | Repos privados, ramas, pull requests, merge y respaldo |
+| «Abrí otra sesión» | `sesiones-en-paralelo` | Varias sesiones en el mismo proyecto sin pisarse, y cómo recuperar lo que «se perdió» |
+| «Que no se pueda commitear en main» | `proteger-main-con-hook` | Un hook que bloquea los commits en `main` aunque alguien se olvide de la regla |
+
+## Instalación
+
+### La fácil: que Claude Code lo instale
+
+Abrí Claude Code en cualquier carpeta y pegá esto:
 
 ```
-Clona el repositorio https://github.com/hansvilla/claude-code-starter en una carpeta temporal, ejecuta el script install.sh para configurar mi entorno global de Claude Code, y confirma qué archivos quedaron instalados en ~/.claude/
+Instalá el Claude Code Starter Kit desde https://github.com/HansVilla21/claude-code-starter: descargalo en una carpeta temporal, corré el instalador que corresponde a mi sistema (install.ps1 en Windows, install.sh en Mac o Linux), mostrame qué quedó instalado en mi carpeta .claude y borrá la carpeta temporal.
 ```
 
-> Reemplaza `hansvilla` con el usuario de GitHub correcto si es necesario.
-
-### Opción B — Terminal manual
-
-```bash
-# 1. Clonar el repo
-git clone https://github.com/hansvilla/claude-code-starter ~/claude-code-starter-tmp
-
-# 2. Correr el instalador
-cd ~/claude-code-starter-tmp
-bash install.sh
-
-# 3. Limpiar
-cd ~
-rm -rf ~/claude-code-starter-tmp
-```
-
-### Opción C — Windows (PowerShell)
+### Windows, a mano (PowerShell, no hace falta Git)
 
 ```powershell
-git clone https://github.com/hansvilla/claude-code-starter $env:TEMP\claude-starter
-Set-Location $env:TEMP\claude-starter
-.\install.ps1
+$z="$env:TEMP\starter.zip"; Invoke-WebRequest https://github.com/HansVilla21/claude-code-starter/archive/refs/heads/master.zip -OutFile $z; Expand-Archive $z "$env:TEMP\starter" -Force; powershell -ExecutionPolicy Bypass -File "$env:TEMP\starter\claude-code-starter-master\install.ps1"
 ```
 
----
+### Mac o Linux, a mano
 
-## Primer uso después de instalar
-
-Abre Claude Code en cualquier proyecto nuevo y escribe:
-
-```
-/init-proyecto
+```bash
+git clone https://github.com/HansVilla21/claude-code-starter /tmp/claude-code-starter && bash /tmp/claude-code-starter/install.sh && rm -rf /tmp/claude-code-starter
 ```
 
-Claude te preguntará el nombre, propósito y tipo de proyecto, y generará toda la estructura automáticamente.
+El instalador respalda todo lo que reemplaza en `.claude/backups/` y no toca tu `settings.json`.
 
----
+## Primer uso
 
-## Tipos de proyecto soportados por `/init-proyecto`
+Abrí Claude Code en una carpeta vacía y contale qué querés, como se lo contarías a alguien:
 
-| Tipo | Qué genera |
-|------|-----------|
-| `agentes` | Sistema multi-agente con orquestador, memoria, skills, templates |
-| `software` | App/API/script con agente code-reviewer, tests, docs |
-| `contenido` | Marketing/RRSS con memoria de marca, audiencia, contenido ganador |
-| `generico` | Estructura mínima funcional para cualquier proyecto |
+> «Creemos un proyecto para armar los planes de entrenamiento de mis clientes. Hoy los hago en
+> Excel y cada uno me lleva dos horas.»
 
----
+Claude arma el proyecto, te pregunta lo justo y te propone el primer trabajo real. Después
+trabajás normal: al cerrar decís «guardá todo», y cuando algo se repite, Claude te propone
+convertirlo en skill.
 
-## Comandos disponibles (globales, funcionan en cualquier proyecto)
+## Cómo funciona un proyecto
 
-```
-/init-proyecto   → Inicializa cualquier proyecto nuevo con estructura completa
-/commit          → Commit inteligente con verificación de secretos
-/review          → Revisión del trabajo actual con severidad (🔴🟡🔵)
-/progress        → Estado del proyecto: hecho, en progreso, pendiente
-/security-check  → Auditoría completa de seguridad
-/help            → Mapa completo del proyecto actual
-```
+- **La sesión principal orquesta.** Entiende lo que pedís, decide quién lo hace y te responde.
+  Los agentes especialistas se suman cuando aparece un rol que se repite.
+- **La memoria vive en el proyecto** (`memory/`) y se actualiza sola: decisiones, aprendizajes,
+  tareas y un resumen al cerrar cada sesión.
+- **Las skills salen del uso.** Se escriben cuando un proceso ya funcionó, no antes. Un proyecto
+  que arranca liviano y aprende trabajando le gana a uno lleno de procedimientos que nadie usó.
+- **Los datos sensibles no salen de tu computadora.** Nunca a GitHub.
 
----
+## Si tenías la versión 1
 
-## Requisitos
+- El instalador mueve al respaldo los comandos viejos que ahora son skills (`init-proyecto`,
+  `commit`, `review`, `progress`, `security-check`). Los demás quedan donde estaban.
+- Si tu `settings.json` tiene el hook de la v1 (`verify-no-secrets.py` con `python3`) y te da
+  error, sacalo de ahí: la v2 ya no lo usa.
 
-- [Claude Code](https://claude.ai/claude-code) instalado
-- Git instalado
-- Python 3 (para el hook de seguridad)
+## Qué cambió en la versión 2
 
----
-
-## Estructura del repo
-
-```
-claude-code-starter/
-├── README.md
-├── install.sh          ← Instalador para Mac/Linux/Git Bash (Windows)
-├── install.ps1         ← Instalador para Windows PowerShell
-└── global/             ← Archivos que van a ~/.claude/
-    ├── CLAUDE.md
-    ├── settings.json
-    ├── commands/
-    │   ├── init-proyecto.md
-    │   ├── commit.md
-    │   ├── review.md
-    │   ├── progress.md
-    │   ├── security-check.md
-    │   └── help.md
-    └── hooks/
-        └── verify-no-secrets.py
-```
-
----
+- Skills en lugar de comandos: se activan hablando.
+- `init-proyecto` ya no pregunta el tipo de proyecto: todo proyecto es de agentes, y arranca
+  liviano.
+- Skills nuevas: `checkpoint`, `github`, `creador-de-skills`, `crear-agente`,
+  `verificar-que-funciona`, `perfil-del-usuario`, `tarjeta-de-hoy`, `sesiones-en-paralelo`,
+  `proteger-main-con-hook`, `matar-el-olor-a-ia`, `archivar-en-vez-de-borrar` y
+  `reporte-de-traspaso`.
+- Las reglas globales, al día con cómo trabajamos hoy.
+- El instalador respalda con fecha, no toca `settings.json`, no necesita Python y funciona en el
+  PowerShell que trae Windows.
 
 ## Créditos
 
-Desarrollado por [Hans Villalobos](https://instagram.com/hansvilla.ai) para Momentum AI Academy.
+Hecho por [Hans Villalobos](https://instagram.com/hansvilla.ai) — Momentum AI.

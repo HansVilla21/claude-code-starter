@@ -1,0 +1,4 @@
+# Los scripts y el hook van siempre con saltos de línea de Unix: con los de Windows no corren.
+*.sh text eol=lf
+global/skills/proteger-main-con-hook/pre-commit text eol=lf
+*.md text eol=lf
