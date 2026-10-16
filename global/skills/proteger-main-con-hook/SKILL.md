@@ -51,7 +51,9 @@ git config core.hooksPath              # tiene que decir: .githooks
   porque todavía no hay rama que proteger; desde el segundo, `main` queda cerrado.
 - **Repo que ya existe:** instalalo, probalo, y commitealo en una rama con pull request, como
   cualquier cambio.
-- **Desde Windows**, sumá `.githooks/* text eol=lf` al `.gitattributes` del proyecto (con saltos de línea de Windows el hook no corre), y agregalo ejecutable para quien clone en Mac o Linux:
+- **Desde Windows**, para quien clone en Mac o Linux: sumá `.githooks/* text eol=lf` al
+  `.gitattributes` del proyecto (con saltos de línea de Windows el hook falla ahí) y agregalo
+  ejecutable:
   `git add --chmod=+x .githooks/pre-commit`.
 
 **Probalo:** parado en `main`, `git commit --allow-empty -m "prueba"` tiene que terminar en
