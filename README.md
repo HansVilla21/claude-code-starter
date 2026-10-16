@@ -64,7 +64,7 @@ Instalá el Claude Code Starter Kit desde https://github.com/HansVilla21/claude-
 ### Windows, a mano (PowerShell, no hace falta Git)
 
 ```powershell
-$z="$env:TEMP\starter.zip"; Invoke-WebRequest https://github.com/HansVilla21/claude-code-starter/archive/refs/heads/master.zip -OutFile $z; Expand-Archive $z "$env:TEMP\starter" -Force; powershell -ExecutionPolicy Bypass -File "$env:TEMP\starter\claude-code-starter-main\install.ps1"
+$z="$env:TEMP\starter.zip"; Invoke-WebRequest https://github.com/HansVilla21/claude-code-starter/archive/refs/heads/master.zip -OutFile $z; Expand-Archive $z "$env:TEMP\starter" -Force; powershell -ExecutionPolicy Bypass -File "$env:TEMP\starter\claude-code-starter-master\install.ps1"
 ```
 
 ### Mac o Linux, a mano
